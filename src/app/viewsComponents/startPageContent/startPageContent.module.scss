@@ -1,0 +1,27 @@
+/* postcss-bem-linter: define garage */
+.garage {
+  cursor: pointer;
+  padding: 8px;
+  font-size: 18px;
+  font-weight: bold;
+
+  &__content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    max-width: 768px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  &__control {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+  }
+}

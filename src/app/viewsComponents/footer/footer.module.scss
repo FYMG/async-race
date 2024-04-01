@@ -1,0 +1,13 @@
+/* postcss-bem-linter: define footer */
+.footer {
+  margin-top: auto;
+
+  .footer__content {
+    display: flex;
+    justify-content: center;
+
+    max-width: 768px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+}

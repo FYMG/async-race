@@ -1,0 +1,22 @@
+{
+    "semi": true,
+    "trailingComma": "all",
+    "singleQuote": true,
+    "printWidth": 90,
+    "tabWidth": 4,
+    "endOfLine": "lf",
+    "overrides": [
+        {
+            "files": ["**/*.s?(a|c)ss", "**/*.module.s?(a|c)ss"],
+            "options": {
+                "tabWidth": 2
+            }
+        },
+        {
+            "files": ["**/*.{js, jsx, ts, tsx, cjs, mjs}"],
+            "options": {
+                "trailingComma": "es5"
+            }
+        }
+    ]
+}

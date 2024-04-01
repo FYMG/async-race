@@ -1,0 +1,87 @@
+{
+    "name": "rss-async-race-task",
+    "version": "1.0.0",
+    "engines": {
+        "node": "21.6.2"
+    },
+    "description": "",
+    "main": "vite.config.ts",
+    "type": "module",
+    "scripts": {
+        "start": "vite --host",
+        "build": "vite build",
+        "preview": "vite preview",
+        "deploy": "vite build && gh-pages -d build",
+        "format": "prettier **/* --write --ignore-path .gitignore",
+        "ci:format": "prettier **/* --check --ignore-path .gitignore",
+        "lint": "eslint \"**/*.{js, jsx, ts, tsx, cjs, mjs}\" --ignore-path .gitignore",
+        "lint:write": "eslint \"**/*.{js, jsx, ts, tsx, cjs, mjs}\" --ignore-path .gitignore --fix",
+        "prepare": "husky"
+    },
+    "homepage": "https://rolling-scopes-school.github.io/fymg-JSFE2023Q4",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/rolling-scopes-school/fymg-JSFE2023Q4.git"
+    },
+    "keywords": [],
+    "author": "FYMG",
+    "license": "ISC",
+    "devDependencies": {
+        "@commitlint/cli": "^19.0.3",
+        "@commitlint/config-conventional": "^19.0.3",
+        "@commitlint/format": "^19.0.3",
+        "@types/css-modules": "^1.0.5",
+        "@types/node": "^20.11.24",
+        "@types/node-sass": "^4.11.7",
+        "@typescript-eslint/eslint-plugin": "^7.1.1",
+        "@typescript-eslint/parser": "^7.0.2",
+        "eslint": "^8.57.0",
+        "eslint-config-airbnb-base": "^15.0.0",
+        "eslint-config-airbnb-typescript": "^17.1.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-import-resolver-typescript": "^3.6.1",
+        "eslint-plugin-import": "^2.29.1",
+        "eslint-plugin-jsx-a11y": "^6.8.0",
+        "eslint-plugin-prettier": "^5.1.3",
+        "eslint-plugin-promise": "^6.1.1",
+        "eslint-plugin-sonarjs": "^0.24.0",
+        "gh-pages": "^6.1.1",
+        "husky": "^9.0.11",
+        "lint-staged": "^15.2.2",
+        "postcss": "^8.4.35",
+        "postcss-scss": "^4.0.9",
+        "prettier": "3.2.5",
+        "sass": "^1.71.1",
+        "stylelint": "^16.2.1",
+        "stylelint-config-clean-order": "^5.4.1",
+        "stylelint-config-prettier-scss": "^1.0.0",
+        "stylelint-config-recommended-scss": "^14.0.0",
+        "stylelint-config-standard": "^36.0.0",
+        "stylelint-order": "^6.0.4",
+        "stylelint-prettier": "4.1.0",
+        "stylelint-scss": "^6.2.1",
+        "stylelint-selector-bem-pattern": "^4.0.0",
+        "tslib": "^2.6.2",
+        "typescript": "^5.3.3",
+        "typescript-eslint": "^7.1.1",
+        "validate-branch-name": "^1.3.0",
+        "vite": "^5.1.4",
+        "vite-plugin-checker": "^0.6.4",
+        "vite-plugin-dts": "^3.7.3",
+        "vite-plugin-eslint": "^1.8.1",
+        "vite-plugin-stylelint": "^5.3.1",
+        "vite-tsconfig-paths": "^4.3.1"
+    },
+    "volta": {
+        "node": "21.6.2",
+        "yarn": "4.1.1"
+    },
+    "packageManager": "yarn@4.1.1",
+    "validate-branch-name": {
+        "pattern": "^(feat|chore|fix|refactor|style|test|docs|build|ops|perf)\\/(RSS-PZ-\\d{2,5})_([A-z]+)",
+        "errorMsg": "Name branches with a clear reference to the feature or issue, e.g., feat/RSS-PZ-01_implementLoginForm. If there is no pre-existing issue number, you may create your own for organizational purposes."
+    },
+    "dependencies": {
+        "normalize.css": "^8.0.1"
+    }
+}
