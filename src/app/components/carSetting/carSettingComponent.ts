@@ -7,13 +7,16 @@ import style from '@viewsComponents/startPageContent/startPageContent.module.scs
 import { useRaceApi } from '@services/api.ts';
 import mergeClassLists from '@utils/helpers/mergeClassLists';
 import ICarModel from '@models/ICarModel';
+import { CarComponent } from '@components/Car/carComponent';
 
-class CarSettingComponent extends BaseComponent<HTMLDivElement> {
+export class CarSettingComponent extends BaseComponent<HTMLDivElement> {
     private nameComponent: BaseComponent<HTMLInputElement>;
 
     private colorComponent: BaseComponent<HTMLInputElement>;
 
     private car?: ICarModel;
+
+    private carComponent: CarComponent | null = null;
 
     constructor(
         colorComponent: BaseComponent<HTMLInputElement>,
@@ -35,12 +38,14 @@ class CarSettingComponent extends BaseComponent<HTMLDivElement> {
             this.colorComponent.getNode().value,
             (data) => {
                 callback?.(data);
+                this.carComponent?.render();
             },
         );
     }
 
-    public selectCar(car: ICarModel) {
+    public selectCar(car: ICarModel, carComponent: CarComponent) {
         this.car = car;
+        this.carComponent = carComponent;
         this.nameComponent.getNode().value = car.name;
         this.colorComponent.getNode().value = car.color;
     }

@@ -3,8 +3,9 @@ import { useLocalStorageProvider } from '@services/localStorageProvider';
 import { ICrateCarRequest, ICrateCarResponse } from '@models/raceApi/post/ICreateCar';
 import { IGetCarsQueryParams, IGetCarsResponse } from '@models/raceApi/get/IGetCars';
 import { IGetCarResponse } from '@models/raceApi/get/IGetCar';
-import ICarModel from '@models/ICarModel.ts';
+import ICarModel from '@models/ICarModel';
 import carBrands from '@utils/consts/carBrands';
+import carModels from '@utils/consts/carModels';
 
 enum HttpMethod {
     GET = 'GET',
@@ -284,7 +285,8 @@ class RaceApi {
         for (let i = 0; i < count; i += 1) {
             cars.push(
                 this.createCar(
-                    carBrands[Math.floor(Math.random() * carBrands.length)] ?? 'Moscvich',
+                    `${carBrands[Math.floor(Math.random() * carBrands.length)]} ${carModels[Math.floor(Math.random() * carModels.length)]}` ??
+                        'Moscvich ultimate',
                     `#${Math.floor(Math.random() * 16777215).toString(16)}`,
                 ),
             );
@@ -298,7 +300,7 @@ class RaceApi {
         color: string,
         callback: LoadCallback<ICarModel>,
     ) {
-        this.postResp<ICarModel, Omit<ICarModel, 'id'>>({
+        this.putResp<ICarModel, Omit<ICarModel, 'id'>>({
             endpoint: `${Endpoints.garage}/${id}`,
             callback,
             body: {
