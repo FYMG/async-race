@@ -7,6 +7,7 @@ import mergeClassLists from '@utils/helpers/mergeClassLists';
 import { useRaceApi } from '@services/api';
 import { CarSettingComponent } from '@components/carSetting/carSettingComponent';
 import flagImg from '@assets/flag.png';
+import carSvg from '@utils/car.svg.ts';
 import style from './car.module.scss';
 
 export class CarComponent extends BaseComponent<HTMLDivElement> {
@@ -31,6 +32,10 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
                 tag: 'div',
                 classList: style['car__control'],
                 children: [
+                    createComponent({
+                        tag: 'span',
+                        textContent: carObj.name,
+                    }),
                     createComponent({
                         tag: 'button',
                         classList: style['car__control-button'],
@@ -70,11 +75,22 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
                 ],
             });
 
-            const trackCar = createComponent({
+            const trackCar = createComponent<HTMLElement>({
                 tag: 'div',
                 classList: style['car__track-car'],
                 textContent: 'start',
             });
+
+            trackCar.getNode().innerHTML = carSvg;
+            trackCar
+                .getNode()
+                .querySelector('svg')
+                ?.classList.add(style['car__track-car-svg'] ?? 'car__track-car-svg');
+            const carBody: HTMLElement | null = trackCar
+                .getNode()
+                .querySelector('.car__body');
+
+            carBody?.style.setProperty('fill', carObj.color);
 
             const track = createComponent({
                 tag: 'div',

@@ -16,6 +16,13 @@
     margin-left: auto;
   }
 
+  &__cars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
   &__control {
     display: flex;
     flex-wrap: wrap;
