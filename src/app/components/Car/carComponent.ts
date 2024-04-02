@@ -8,6 +8,7 @@ import { useRaceApi } from '@services/api';
 import { CarSettingComponent } from '@components/carSetting/carSettingComponent';
 import flagImg from '@assets/flag.png';
 import carSvg from '@utils/car.svg.ts';
+import { IPatchEngineResponse } from '@models/raceApi/patch/IPatchEngine';
 import style from './car.module.scss';
 
 export class CarComponent extends BaseComponent<HTMLDivElement> {
@@ -17,7 +18,7 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
 
     private trackCar: BaseComponent | null = null;
 
-    // private engineStart = false;
+    private engineStats: IPatchEngineResponse | null = null;
 
     constructor(id: number, editComponent: CarSettingComponent, props: IProps) {
         super(props);
@@ -54,6 +55,16 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
                     }).addEventListener('click', () => {
                         this.editComponent.selectCar(carObj, this);
                     }),
+                    createComponent({
+                        tag: 'button',
+                        classList: style['car__control-button'],
+                        textContent: 'start',
+                    }).addEventListener('click', () => this.start()),
+                    createComponent({
+                        tag: 'button',
+                        classList: style['car__control-button'],
+                        textContent: 'drive',
+                    }).addEventListener('click', () => this.drive()),
                 ],
             });
 
@@ -108,13 +119,47 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
         return this;
     }
 
-    turn() {
-        console.log(1);
+    stop() {
+        useRaceApi().engineStop(this.id, (data) => {
+            this.engineStats = data;
+            this.trackCar?.getNode().style.setProperty('left', '0');
+        });
+    }
+
+    start() {
+        useRaceApi().engineStart(this.id, (data) => {
+            this.engineStats = data;
+            this.trackCar?.getNode().style.setProperty('left', '0');
+        });
     }
 
     drive() {
-        this.trackCar?.getNode().style.setProperty('left', '0px');
-        console.log(2);
+        const drivePerPeriod = this.engineStats!.velocity * 100;
+        let letToGo = this.engineStats!.distance;
+        const totalDistance = this.engineStats!.distance;
+        const driveInterval = setInterval(() => {
+            letToGo -= drivePerPeriod;
+            if (drivePerPeriod > letToGo) {
+                clearInterval(driveInterval);
+                letToGo = 0;
+            }
+            const node = this.trackCar!.getNode();
+            const totalWidth = this.getNode().clientWidth;
+            node.style.setProperty(
+                'left',
+                `${(totalWidth - 40) * ((totalDistance - letToGo) / totalDistance)}px`,
+            );
+        }, 100);
+        const timeStartTime = Date.now();
+        useRaceApi().engineDrive(this.id, (data) => {
+            const time = Date.now() - timeStartTime;
+            if (data.success === false) {
+                clearInterval(driveInterval);
+                console.log(time);
+            } else {
+                console.log(time);
+            }
+        });
     }
 }
 

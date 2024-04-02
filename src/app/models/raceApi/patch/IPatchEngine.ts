@@ -1,8 +1,8 @@
-interface IPatchEngineResponse {
+export interface IPatchEngineResponse {
     velocity: number;
     distance: number;
 }
 
-interface IPatchEngineResponseDrive {
+export interface IPatchEngineResponseDrive {
     success: boolean;
 }

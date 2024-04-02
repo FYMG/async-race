@@ -5,6 +5,10 @@ import { IGetCarResponse } from '@models/raceApi/get/IGetCar';
 import ICarModel from '@models/ICarModel';
 import carBrands from '@utils/consts/carBrands';
 import carModels from '@utils/consts/carModels';
+import {
+    IPatchEngineResponse,
+    IPatchEngineResponseDrive,
+} from '@models/raceApi/patch/IPatchEngine';
 
 enum HttpMethod {
     GET = 'GET',
@@ -302,7 +306,7 @@ class RaceApi {
             endpoint: `${Endpoints.engine}`,
             urlParams: {
                 id,
-                status: EngineStatuses.started,
+                status: EngineStatuses.drive,
             },
             callback,
             errorCallback: (data) => {
