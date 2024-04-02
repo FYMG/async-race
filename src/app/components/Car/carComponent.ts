@@ -15,6 +15,8 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
 
     private editComponent: CarSettingComponent;
 
+    private trackCar: BaseComponent | null = null;
+
     // private engineStart = false;
 
     constructor(id: number, editComponent: CarSettingComponent, props: IProps) {
@@ -92,6 +94,8 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
 
             carBody?.style.setProperty('fill', carObj.color);
 
+            this.trackCar = trackCar;
+
             const track = createComponent({
                 tag: 'div',
                 classList: style['car__track'],
@@ -102,6 +106,15 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
         });
 
         return this;
+    }
+
+    turn() {
+        console.log(1);
+    }
+
+    drive() {
+        this.trackCar?.getNode().style.setProperty('left', '0px');
+        console.log(2);
     }
 }
 

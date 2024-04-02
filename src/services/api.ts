@@ -1,5 +1,4 @@
 import throwError from '@utils/helpers/throwError';
-import { useLocalStorageProvider } from '@services/localStorageProvider';
 import { ICrateCarRequest, ICrateCarResponse } from '@models/raceApi/post/ICreateCar';
 import { IGetCarsQueryParams, IGetCarsResponse } from '@models/raceApi/get/IGetCars';
 import { IGetCarResponse } from '@models/raceApi/get/IGetCar';
@@ -12,6 +11,7 @@ enum HttpMethod {
     POST = 'POST',
     PUT = 'PUT',
     DELETE = 'DELETE',
+    PATCH = 'PATCH',
 }
 
 interface IUrlParams {
@@ -23,57 +23,51 @@ interface IHeaders {
     readonly 'X-Total-Count'?: string;
 }
 
-interface ILoadProps<ResponseType, RequestType> {
+interface ILoadProps<
+    ResponseType,
+    RequestBody = NonNullable<unknown>,
+    UrlParams extends IUrlParams = NonNullable<unknown>,
+> {
     readonly method: HttpMethod;
     readonly endpoint: string;
     readonly callback: LoadCallback<ResponseType>;
-    readonly errorCallback?: () => void;
-    readonly body?: RequestType;
-    readonly urlParams?: IUrlParams;
+    readonly errorCallback?: LoadErrorCallback;
+    body?: RequestBody | NonNullable<unknown>;
+    urlParams?: UrlParams | NonNullable<unknown>;
     readonly headers?: IHeaders;
 }
 
-interface IGetRespProps<
-    ResponseType,
+interface IBaseRespProps<
+    ResponseBody = NonNullable<unknown>,
+    RequestBody = NonNullable<unknown>,
     UrlParams extends IUrlParams = NonNullable<unknown>,
 > {
     endpoint: string;
-    urlParams?: IUrlParams & UrlParams;
+    callback?: LoadCallback<ResponseBody>;
+    errorCallback?: LoadErrorCallback;
     headers?: IHeaders;
-    callback?: LoadCallback<ResponseType>;
+    body?: RequestBody | NonNullable<unknown>;
+    urlParams?: UrlParams | NonNullable<unknown>;
 }
 
-interface IPostRespProps<ResponseType, RequestType, UrlParams = IUrlParams> {
-    endpoint: string;
-    callback?: LoadCallback<ResponseType>;
-    errorCallback?: () => void;
-    body?: RequestType;
-    urlParams?: UrlParams & IUrlParams;
-}
-
-interface IPutRespProps<ResponseType, RequestType, UrlParams = IUrlParams> {
-    endpoint: string;
-    callback?: LoadCallback<ResponseType>;
-    body?: RequestType;
-    urlParams?: UrlParams & IUrlParams;
-}
-
-interface IDeleteRespProps<
-    ResponseType,
+type GerRespProps<
+    ResponseBody,
     UrlParams extends IUrlParams = NonNullable<unknown>,
-> {
-    endpoint: string;
-    urlParams?: IUrlParams & UrlParams;
-    headers?: IHeaders;
-    callback?: LoadCallback<ResponseType>;
-}
+> = Omit<IBaseRespProps<ResponseBody, NonNullable<unknown>, UrlParams>, 'body'>;
 
 type LoadCallback<ResponseType> = (data: ResponseType, headers: Headers) => void;
+type LoadErrorCallback = (data: Response) => void;
 
 enum Endpoints {
     garage = '/garage',
     engine = '/engine',
     winners = '/winners',
+}
+
+enum EngineStatuses {
+    started = 'started',
+    stopped = 'stopped',
+    drive = 'drive',
 }
 
 class RaceApi {
@@ -88,10 +82,7 @@ class RaceApi {
 
     public static create(baseUrl?: string): RaceApi {
         if (RaceApi.instance) {
-            throwError('Auth Provider already created');
-        }
-        if (!useLocalStorageProvider().isInitialized) {
-            throwError('For a AuthProvider work, initiate localStorageProvider first');
+            throwError('RaceApi Provider already created');
         }
         if (baseUrl) {
             RaceApi.baseUrl = baseUrl;
@@ -100,12 +91,12 @@ class RaceApi {
         return RaceApi.instance;
     }
 
-    public getResp<ResponseType, UrlParams = IUrlParams>({
+    public getResp<ResponseType, UrlParams extends IUrlParams = NonNullable<unknown>>({
         endpoint,
-        urlParams = {} as IUrlParams & UrlParams,
+        urlParams = {},
         headers = {},
         callback = throwError('No callback for GET response'),
-    }: IGetRespProps<ResponseType, IUrlParams & UrlParams>) {
+    }: GerRespProps<ResponseType, IUrlParams & UrlParams>) {
         this.load<ResponseType>({
             method: HttpMethod.GET,
             endpoint,
@@ -117,10 +108,10 @@ class RaceApi {
 
     public deleteResp<ResponseType, UrlParams>({
         endpoint,
-        urlParams = {} as IUrlParams & UrlParams,
+        urlParams = {},
         headers = {},
         callback = () => {},
-    }: IDeleteRespProps<ResponseType, IUrlParams & UrlParams>) {
+    }: IBaseRespProps<ResponseType, IUrlParams & UrlParams>) {
         this.load<ResponseType>({
             method: HttpMethod.DELETE,
             endpoint,
@@ -131,18 +122,39 @@ class RaceApi {
     }
 
     public postResp<
-        ResponseType = Record<PropertyKey, never>,
-        RequestType = Record<PropertyKey, never>,
-        UrlParams = IUrlParams,
+        ResponseType = NonNullable<unknown>,
+        RequestType = NonNullable<unknown>,
+        UrlParams extends IUrlParams = NonNullable<unknown>,
     >({
         endpoint,
         callback = throwError('No callback for GET response'),
         errorCallback = () => {},
-        body = {} as RequestType,
-        urlParams = {} as IUrlParams & UrlParams,
-    }: IPostRespProps<ResponseType, RequestType, UrlParams>) {
+        body = {},
+        urlParams = {},
+    }: IBaseRespProps<ResponseType, RequestType, UrlParams>) {
         this.load<ResponseType, RequestType>({
             method: HttpMethod.POST,
+            endpoint,
+            callback,
+            errorCallback,
+            urlParams,
+            body,
+        });
+    }
+
+    public patchResp<
+        ResponseType = NonNullable<unknown>,
+        RequestType = NonNullable<unknown>,
+        UrlParams extends IUrlParams = NonNullable<unknown>,
+    >({
+        endpoint,
+        callback = throwError('No callback for GET response'),
+        errorCallback = () => {},
+        body = {},
+        urlParams = {},
+    }: IBaseRespProps<ResponseType, RequestType, UrlParams>) {
+        this.load<ResponseType, RequestType>({
+            method: HttpMethod.PATCH,
             endpoint,
             callback,
             errorCallback,
@@ -154,13 +166,13 @@ class RaceApi {
     public putResp<
         ResponseType = Record<PropertyKey, never>,
         RequestType = Record<PropertyKey, never>,
-        UrlParams = IUrlParams,
+        UrlParams extends IUrlParams = IUrlParams,
     >({
         endpoint,
         callback = throwError('No callback for GET response'),
-        body = {} as RequestType,
-        urlParams = {} as IUrlParams & UrlParams,
-    }: IPutRespProps<ResponseType, RequestType, UrlParams>) {
+        body = {},
+        urlParams = {},
+    }: IBaseRespProps<ResponseType, RequestType, UrlParams>) {
         this.load<ResponseType, RequestType>({
             method: HttpMethod.PUT,
             endpoint,
@@ -172,11 +184,11 @@ class RaceApi {
 
     private async errorHandler(
         res: Response,
-        errorCallback = () => {},
+        errorCallback: LoadErrorCallback = () => {},
     ): Promise<Response> {
         if (!res.ok) {
             console.log('error');
-            errorCallback();
+            errorCallback(res);
         }
 
         return res;
@@ -263,6 +275,46 @@ class RaceApi {
         });
     }
 
+    public engineStop(id: number, callback?: (data: IPatchEngineResponse) => void) {
+        this.patchResp({
+            endpoint: `${Endpoints.engine}`,
+            urlParams: {
+                id,
+                status: EngineStatuses.stopped,
+            },
+            callback,
+        });
+    }
+
+    public engineStart(id: number, callback?: (data: IPatchEngineResponse) => void) {
+        this.patchResp({
+            endpoint: `${Endpoints.engine}`,
+            urlParams: {
+                id,
+                status: EngineStatuses.started,
+            },
+            callback,
+        });
+    }
+
+    public engineDrive(id: number, callback?: (data: IPatchEngineResponseDrive) => void) {
+        this.patchResp({
+            endpoint: `${Endpoints.engine}`,
+            urlParams: {
+                id,
+                status: EngineStatuses.started,
+            },
+            callback,
+            errorCallback: (data) => {
+                if (data.status === 500) {
+                    callback?.({
+                        success: false,
+                    });
+                }
+            },
+        });
+    }
+
     public getCar(id: number, callback: LoadCallback<IGetCarResponse>) {
         this.getResp<IGetCarResponse>({
             endpoint: `${Endpoints.garage}/${id}`,
@@ -321,10 +373,13 @@ class RaceApi {
 
 export const useRaceApi = () => {
     if (!RaceApi.getInstance()) {
-        throwError('Auth Provider not created');
+        throwError('RaceApi Provider not created');
     }
     const raceApi = RaceApi.getInstance();
     return {
+        engineStop: raceApi.engineStop.bind(raceApi),
+        engineStart: raceApi.engineStart.bind(raceApi),
+        engineDrive: raceApi.engineDrive.bind(raceApi),
         generateCars: raceApi.generateCars.bind(raceApi),
         updateCar: raceApi.updateCar.bind(raceApi),
         deleteCar: raceApi.deleteCar.bind(raceApi),
