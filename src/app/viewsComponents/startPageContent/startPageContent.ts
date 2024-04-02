@@ -6,6 +6,7 @@ import carSettingComponent from '@components/carSetting/carSettingComponent';
 import { useRaceApi } from '@services/api.ts';
 import carComponent, { CarComponent } from '@components/Car/carComponent';
 import loaderComponent from '@components/loader/loaderComponent';
+
 import style from './startPageContent.module.scss';
 
 const startPageContent: typeof createComponent<HTMLElement> = ({
@@ -24,7 +25,9 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
         classList: style['garage__cars'],
     });
 
-    const carEditComponent = carSettingComponent({ edit: true });
+    const carEditComponent = carSettingComponent({
+        edit: true,
+    });
 
     const stopAllCars = () => {
         if (
@@ -75,10 +78,17 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
         });
     };
 
+    carEditComponent.addEventListener('click', () => {
+        goToPage(racePage);
+    });
+
     const controlBlock = createComponent<HTMLDivElement>({
         tag: 'div',
         classList: style['garage__control'],
-        children: [carSettingComponent({ edit: false }), carEditComponent],
+        children: [
+            carSettingComponent({ edit: false, update: () => goToPage(page) }),
+            carEditComponent,
+        ],
     });
 
     const controlButtons = createComponent<HTMLDivElement>({
@@ -147,7 +157,7 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
                 if (page === 1) {
                     return;
                 }
-                goToPage(page + 1);
+                goToPage(page - 1);
                 currPage.getNode().textContent = `Page ${page}`;
             }),
             currPage,
@@ -156,7 +166,7 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
                 classList: style['garage__pagination-button'],
                 textContent: 'next',
             }).addEventListener('click', () => {
-                if (Math.floor(totalItems / limit) === page) {
+                if (totalItems / limit <= page + 1) {
                     return;
                 }
                 goToPage(page + 1);
@@ -171,7 +181,7 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
         children: [controlBlock, controlButtons, carsComponent, pagination],
     });
 
-    return createComponent({
+    const main = createComponent({
         tag: 'main',
         classList: mergeClassLists(style['garage'], classList),
         children: mergeChildrenLists(content, children),
@@ -179,5 +189,11 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
     }).componentDidMount(() => {
         goToPage(page);
     });
+
+    main.onRoute = () => {
+        goToPage(page);
+    };
+
+    return main;
 };
 export default startPageContent;

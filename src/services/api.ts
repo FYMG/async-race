@@ -9,6 +9,7 @@ import {
     IPatchEngineResponse,
     IPatchEngineResponseDrive,
 } from '@models/raceApi/patch/IPatchEngine';
+import { IWinnerModel } from '@models/IWinnerModel.ts';
 
 enum HttpMethod {
     GET = 'GET',
@@ -34,7 +35,7 @@ interface ILoadProps<
 > {
     readonly method: HttpMethod;
     readonly endpoint: string;
-    readonly callback: LoadCallback<ResponseType>;
+    readonly callback?: LoadCallback<ResponseType>;
     readonly errorCallback?: LoadErrorCallback;
     body?: RequestBody | NonNullable<unknown>;
     urlParams?: UrlParams | NonNullable<unknown>;
@@ -99,7 +100,7 @@ class RaceApi {
         endpoint,
         urlParams = {},
         headers = {},
-        callback = throwError('No callback for GET response'),
+        callback,
     }: GerRespProps<ResponseType, IUrlParams & UrlParams>) {
         this.load<ResponseType>({
             method: HttpMethod.GET,
@@ -131,7 +132,7 @@ class RaceApi {
         UrlParams extends IUrlParams = NonNullable<unknown>,
     >({
         endpoint,
-        callback = throwError('No callback for GET response'),
+        callback,
         errorCallback = () => {},
         body = {},
         urlParams = {},
@@ -152,7 +153,7 @@ class RaceApi {
         UrlParams extends IUrlParams = NonNullable<unknown>,
     >({
         endpoint,
-        callback = throwError('No callback for GET response'),
+        callback,
         errorCallback = () => {},
         body = {},
         urlParams = {},
@@ -173,7 +174,7 @@ class RaceApi {
         UrlParams extends IUrlParams = IUrlParams,
     >({
         endpoint,
-        callback = throwError('No callback for GET response'),
+        callback,
         body = {},
         urlParams = {},
     }: IBaseRespProps<ResponseType, RequestType, UrlParams>) {
@@ -237,7 +238,7 @@ class RaceApi {
                     };
                 },
             )
-            .then(({ data, ResponseHeaders }) => callback(data, ResponseHeaders))
+            .then(({ data, ResponseHeaders }) => callback?.(data, ResponseHeaders))
             .catch((err: Error) => {
                 throw err;
             });
@@ -334,6 +335,85 @@ class RaceApi {
             },
             callback,
         });
+        this.deleteWinner(id);
+    }
+
+    public getWinner(
+        id: number,
+        callback: LoadCallback<IWinnerModel>,
+        errorCallback?: (res: Response) => void,
+    ) {
+        this.getResp<IWinnerModel>({
+            endpoint: `${Endpoints.winners}/${id}`,
+            callback,
+            errorCallback,
+        });
+    }
+
+    public createWinner(
+        id: number,
+        time: number,
+        callback?: (data: IWinnerModel) => void,
+        errorCallback?: (res: Response) => void,
+    ) {
+        this.postResp({
+            endpoint: `${Endpoints.winners}`,
+            body: {
+                id,
+                time,
+                wins: 1,
+            },
+            callback,
+            errorCallback,
+        });
+    }
+
+    public getWinners({
+        page,
+        limit,
+        sort,
+        order,
+        callback,
+    }: {
+        page: number;
+        limit: number;
+        sort: 'id' | 'wins' | 'time';
+        order: 'ASC' | 'DESC';
+        callback: (data: IWinnerModel[], headers: Headers) => void;
+    }) {
+        this.getResp<IWinnerModel[]>({
+            endpoint: Endpoints.winners,
+            urlParams: {
+                _page: page,
+                _limit: limit,
+                _sort: sort,
+                _order: order,
+            },
+            callback,
+        });
+    }
+
+    public deleteWinner(id: number, callback?: () => void) {
+        this.deleteResp({
+            endpoint: `${Endpoints.winners}/${id}`,
+            callback,
+        });
+    }
+
+    public updateWinner(
+        id: number,
+        time: number,
+        wins: number,
+        callback?: (data: IWinnerModel) => void,
+    ) {
+        this.putResp({
+            endpoint: `${Endpoints.winners}/${id}`,
+            body: {
+                wins,
+                time,
+            },
+            callback,
+        });
     }
 
     public generateCars(count: number, callback: (data: ICarModel[]) => void) {
@@ -381,6 +461,10 @@ export const useRaceApi = () => {
     }
     const raceApi = RaceApi.getInstance();
     return {
+        updateWinner: raceApi.updateWinner.bind(raceApi),
+        getWinner: raceApi.getWinner.bind(raceApi),
+        createWinner: raceApi.createWinner.bind(raceApi),
+        getWinners: raceApi.getWinners.bind(raceApi),
         engineStop: raceApi.engineStop.bind(raceApi),
         engineStart: raceApi.engineStart.bind(raceApi),
         engineDrive: raceApi.engineDrive.bind(raceApi),

@@ -113,14 +113,12 @@ class Router {
             }
 
             url.pathname = route.path;
-            if (pushState) {
-                window.history.pushState({}, '', url);
-            }
 
             let routeViewComponent = route.view({});
             this.states[this.prevRoute]?.appendChildren(this.root.getChildren());
             if (this.states[route.path]) {
                 routeViewComponent = this.states[route.path]!;
+                routeViewComponent.getChildren().forEach((item) => item.onRoute());
             } else {
                 this.states[route.path] = routeViewComponent;
             }
@@ -129,6 +127,9 @@ class Router {
             this.root.appendChildren(routeViewComponent.getChildren());
             this.prevRoute = route.path;
             console.log(this.prevRoute, this.states);
+            if (pushState) {
+                window.history.pushState({}, '', url);
+            }
         }
     }
 
@@ -167,11 +168,10 @@ export const useRouter = () => {
         throwError('Router not created');
     }
     const router = Router.getInstance();
-    const routeInfo = router.getRouteInfo();
     return {
         root: router.getRoot(),
         route: router.route.bind(router),
-        args: routeInfo.params,
+        routeInfo: router.getRouteInfo.bind(router),
         isInitialized: Router.getIsInitialized(),
     };
 };

@@ -1,0 +1,58 @@
+/* postcss-bem-linter: define button */
+.button {
+  $font-size: 16px;
+
+  touch-action: manipulation;
+  cursor: pointer;
+  user-select: none;
+
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+
+  box-sizing: border-box;
+  width: 120px;
+  max-width: 460px;
+  padding: calc($font-size * 0.75) calc($font-size * 1.65);
+
+  font-size: $font-size;
+  font-weight: 700;
+  line-height: calc($font-size * 1.75);
+  color: #000;
+  text-align: center;
+  text-decoration: none #000 solid;
+  text-decoration-thickness: auto;
+
+  background-color: #3dd1e7;
+  border: 0 solid #e5e7eb;
+
+  &::after {
+    content: '';
+
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+
+    width: calc(100% - 1px);
+    height: calc(100% - 1px);
+
+    border: 1px solid #000;
+
+    transition: 0.15s ease-in;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  &:disabled,
+  &:hover,
+  &:active {
+    &::after {
+      bottom: 0;
+      left: 0;
+    }
+  }
+}

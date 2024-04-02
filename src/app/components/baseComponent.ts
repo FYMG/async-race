@@ -23,6 +23,8 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
 
     protected parent: BaseComponent | null = null;
 
+    public onRoute = () => {};
+
     constructor(props: IProps<T>) {
         this.props = props;
         this.node = this.createNode(props);

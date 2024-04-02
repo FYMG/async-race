@@ -7,9 +7,10 @@ import mergeClassLists from '@utils/helpers/mergeClassLists';
 import { useRaceApi } from '@services/api';
 import { CarSettingComponent } from '@components/carSetting/carSettingComponent';
 import flagImg from '@assets/flag.png';
-import carSvg from '@utils/car.svg.ts';
+
 import { IPatchEngineResponse } from '@models/raceApi/patch/IPatchEngine';
 import ICarModel from '@models/ICarModel.ts';
+import carImageComponent from '@components/carImage/carImageComponent';
 import style from './car.module.scss';
 
 export class CarComponent extends BaseComponent<HTMLDivElement> {
@@ -35,6 +36,8 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
 
     private lastRaceTime: number;
 
+    private winText: BaseComponent<HTMLElement>;
+
     constructor(carObj: ICarModel, editComponent: CarSettingComponent, props: IProps) {
         super(props);
 
@@ -56,6 +59,17 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
             classList: style['car__control-button'],
             textContent: 'drive',
             disabled: true,
+        });
+
+        this.winText = createComponent({
+            tag: 'div',
+            classList: style['car__win-text'],
+            children: [
+                createComponent({
+                    tag: 'span',
+                    textContent: '',
+                }),
+            ],
         });
     }
 
@@ -103,6 +117,7 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
                 }),
                 this.startButton,
                 this.driveButton,
+                this.winText,
             ],
         });
 
@@ -126,29 +141,15 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
             ],
         });
 
-        const trackCar = createComponent<HTMLElement>({
-            tag: 'div',
+        this.trackCar = carImageComponent({
+            carObj: this.carObj,
             classList: style['car__track-car'],
-            textContent: 'start',
         });
-
-        trackCar.getNode().innerHTML = carSvg;
-        trackCar
-            .getNode()
-            .querySelector('svg')
-            ?.classList.add(style['car__track-car-svg'] ?? 'car__track-car-svg');
-        const carBody: HTMLElement | null = trackCar
-            .getNode()
-            .querySelector('.car__body');
-
-        carBody?.style.setProperty('fill', this.carObj.color);
-
-        this.trackCar = trackCar;
 
         const track = createComponent({
             tag: 'div',
             classList: style['car__track'],
-            children: [trackControlBlock, trackEnd, trackCar],
+            children: [trackControlBlock, trackEnd, this.trackCar],
         });
 
         this.append(track);
@@ -157,10 +158,23 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
     }
 
     public win() {
-        console.log('Im a chapion', this.lastRaceTime);
+        void useRaceApi().getWinner(this.carObj.id, (data) => {
+            if (!data.id) {
+                console.log('create winner');
+                useRaceApi().createWinner(this.carObj.id, this.lastRaceTime);
+                return;
+            }
+            void useRaceApi().updateWinner(
+                this.carObj.id,
+                this.lastRaceTime < data.time ? this.lastRaceTime : data.time,
+                data.wins + 1,
+            );
+        });
+        this.winText.getNode().textContent = `${this.carObj.name} win for ${this.lastRaceTime / 1000} sec!`;
     }
 
     stop(callback?: () => void) {
+        this.winText.getNode().textContent = '';
         if (this.animationInterval) {
             clearInterval(this.animationInterval);
         }
@@ -189,7 +203,7 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
     drive(callback?: (success: boolean) => void) {
         this.driveButton.getNode().disabled = true;
         const currRace = this.raceCounter;
-        const drivePerPeriod = this.engineStats!.velocity * 100;
+        const drivePerPeriod = this.engineStats!.velocity * 90;
         let letToGo = this.engineStats!.distance;
         const totalDistance = this.engineStats!.distance;
         const timeStartTime = Date.now();

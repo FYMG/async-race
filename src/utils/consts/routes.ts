@@ -7,6 +7,7 @@ export interface IRouteParams {
     difficulty?: number;
     level?: number;
     reg?: boolean;
+    page?: number;
 }
 
 export interface IRoute {
@@ -20,7 +21,7 @@ export interface IRoute {
 export interface IRoutes {
     [key: string]: IRoute;
     startPage: IRoute;
-    gamePage: IRoute;
+    winners: IRoute;
 }
 
 const Routes: IRoutes = {
@@ -29,11 +30,11 @@ const Routes: IRoutes = {
         path: '/fymg-JSFE2023Q4/',
         view: startPageView,
         needAuth: false,
-        params: {},
+        params: { page: undefined },
     },
-    gamePage: {
-        name: 'gamePage',
-        path: '/fymg-JSFE2023Q4/game',
+    winners: {
+        name: 'winners',
+        path: '/fymg-JSFE2023Q4/winners',
         view: gamePage,
         needAuth: false,
         params: {

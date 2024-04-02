@@ -52,9 +52,9 @@ export class CarSettingComponent extends BaseComponent<HTMLDivElement> {
 }
 const carSettingComponent: FunctionComponent<
     HTMLDivElement,
-    { edit: boolean },
+    { edit: boolean; update?: () => void },
     CarSettingComponent
-> = ({ classList, edit, ...props }) => {
+> = ({ classList, edit, update, ...props }) => {
     const colorComponent = createComponent<HTMLInputElement>({
         tag: 'input',
         classList: style['create-car__color'],
@@ -90,6 +90,7 @@ const carSettingComponent: FunctionComponent<
                         )
                         .then((data) => {
                             console.log('car success created:', data);
+                            update?.();
                             return data;
                         });
                 }
