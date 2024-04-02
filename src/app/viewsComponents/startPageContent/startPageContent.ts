@@ -4,7 +4,8 @@ import mergeClassLists from '@utils/helpers/mergeClassLists';
 import mergeChildrenLists from '@utils/helpers/mergeChildrenLists';
 import carSettingComponent from '@components/carSetting/carSettingComponent';
 import { useRaceApi } from '@services/api.ts';
-import carComponent from '@components/Car/carComponent';
+import carComponent, { CarComponent } from '@components/Car/carComponent';
+import loaderComponent from '@components/loader/loaderComponent';
 import style from './startPageContent.module.scss';
 
 const startPageContent: typeof createComponent<HTMLElement> = ({
@@ -15,6 +16,8 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
     let page = 1;
     let totalItems = 0;
     const limit = 7;
+    let raceWinner: CarComponent | null = null;
+    let racePage = page;
 
     const carsComponent = createComponent({
         tag: 'div',
@@ -22,8 +25,34 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
     });
 
     const carEditComponent = carSettingComponent({ edit: true });
-    const goToPage = () => {
+
+    const stopAllCars = () => {
+        if (
+            !carsComponent.getChildren().some((item) => {
+                if (item instanceof CarComponent) {
+                    return item.engineIsStarted();
+                }
+                return false;
+            })
+        ) {
+            return;
+        }
+        carsComponent.getChildren().forEach((child) => {
+            if (child instanceof CarComponent) {
+                child.stop();
+                raceWinner = null;
+            }
+        });
+    };
+    const goToPage = (newPage: number) => {
+        racePage = page;
+        page = newPage;
+
+        carsComponent.getChildren().forEach((child) => child.remove());
+        const loader = loaderComponent({});
+        carsComponent.append(loader);
         void useRaceApi().getCars(page, limit, (data, headers) => {
+            stopAllCars();
             carsComponent.getChildren().forEach((child) => {
                 child.destroy();
             });
@@ -38,17 +67,66 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
             data.forEach((car) => {
                 carsComponent.append(
                     carComponent({
-                        carId: car.id,
+                        carObj: car,
                         editComponent: carEditComponent,
                     }),
                 );
             });
         });
     };
+
     const controlBlock = createComponent<HTMLDivElement>({
         tag: 'div',
         classList: style['garage__control'],
         children: [carSettingComponent({ edit: false }), carEditComponent],
+    });
+
+    const controlButtons = createComponent<HTMLDivElement>({
+        tag: 'div',
+        classList: style['garage__control'],
+        children: [
+            createComponent({
+                tag: 'button',
+                classList: style['garage__control-button'],
+                textContent: 'generate 100 cars',
+            }).addEventListener('click', () => {
+                void useRaceApi().generateCars(100, () => {
+                    goToPage(page);
+                });
+            }),
+            createComponent({
+                tag: 'button',
+                classList: style['garage__control-button'],
+                textContent: 'Reset garage',
+            }).addEventListener('click', stopAllCars),
+            createComponent({
+                tag: 'button',
+                classList: style['garage__control-button'],
+                textContent: 'Race',
+            }).addEventListener('click', () => {
+                carsComponent.getChildren().forEach((child) => {
+                    if (
+                        child instanceof CarComponent &&
+                        carsComponent.getChildren().every((item) => {
+                            if (item instanceof CarComponent) {
+                                return !item.engineIsStarted();
+                            }
+                            return !(item instanceof CarComponent);
+                        })
+                    ) {
+                        racePage = page;
+                        child.start(() => {
+                            child.drive((success) => {
+                                if (!raceWinner && success && racePage === page) {
+                                    child.win();
+                                    raceWinner = child;
+                                }
+                            });
+                        });
+                    }
+                });
+            }),
+        ],
     });
 
     const currPage = createComponent({
@@ -69,8 +147,7 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
                 if (page === 1) {
                     return;
                 }
-                page -= 1;
-                goToPage();
+                goToPage(page + 1);
                 currPage.getNode().textContent = `Page ${page}`;
             }),
             currPage,
@@ -82,8 +159,7 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
                 if (Math.floor(totalItems / limit) === page) {
                     return;
                 }
-                page += 1;
-                goToPage();
+                goToPage(page + 1);
                 currPage.getNode().textContent = `Page ${page}`;
             }),
         ],
@@ -92,7 +168,7 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
     const content = createComponent<HTMLDivElement>({
         tag: 'div',
         classList: style['garage__content'],
-        children: [controlBlock, carsComponent, pagination],
+        children: [controlBlock, controlButtons, carsComponent, pagination],
     });
 
     return createComponent({
@@ -101,7 +177,7 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
         children: mergeChildrenLists(content, children),
         ...props,
     }).componentDidMount(() => {
-        goToPage();
+        goToPage(page);
     });
 };
 export default startPageContent;

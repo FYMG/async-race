@@ -88,6 +88,7 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
     }
 
     public addEventListener<K extends keyof HTMLElementEventMap>(
+        this: this,
         type: K,
         listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => void,
         options?: boolean | AddEventListenerOptions | undefined,
