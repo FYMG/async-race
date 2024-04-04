@@ -57,6 +57,7 @@
                 }
             },
             "rules": {
+                "keyword-spacing": ["error", { "before": true, "after": true }],
                 "no-void": 0,
                 "sonarjs/cognitive-complexity": 0, // вернуть
                 "no-param-reassign": 0,

@@ -201,19 +201,26 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
             this.engineStats = data;
             this.engineStarted = true;
             this.trackCar?.getNode().style.setProperty('left', '0');
+
             callback?.();
         });
     }
 
     drive(callback?: (success: boolean) => void) {
-        this.driveButton.getNode().disabled = true;
         const currRace = this.raceCounter;
         const drivePerPeriod = this.engineStats!.velocity * 90;
-        let letToGo = this.engineStats!.distance;
         const totalDistance = this.engineStats!.distance;
         const timeStartTime = Date.now();
+
+        let letToGo = this.engineStats!.distance;
+
+        this.driveButton.getNode().disabled = true;
         this.animationInterval = setInterval(() => {
+            const node = this.trackCar!.getNode();
+            const totalWidth = this.getNode().clientWidth;
+
             letToGo -= drivePerPeriod;
+
             if (drivePerPeriod > letToGo) {
                 if (this.animationInterval) {
                     clearInterval(this.animationInterval);
@@ -221,18 +228,20 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
 
                 letToGo = 0;
             }
-            const node = this.trackCar!.getNode();
-            const totalWidth = this.getNode().clientWidth;
+
             node.style.setProperty(
                 'left',
                 `${(totalWidth - 40) * ((totalDistance - letToGo) / totalDistance)}px`,
             );
         }, 100);
+
         useRaceApi().engineDrive(this.id, (data) => {
             const time = Date.now() - timeStartTime;
+
             if (!this.engineStarted && currRace !== this.raceCounter) {
                 return;
             }
+
             if (data.success === false) {
                 if (this.animationInterval) {
                     clearInterval(this.animationInterval);
@@ -240,6 +249,7 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
             } else {
                 this.lastRaceTime = time;
             }
+
             callback?.(data.success);
         });
     }

@@ -3,11 +3,11 @@ import header from '@viewsComponents/header/header';
 import footer from '@viewsComponents/footer/footer';
 import winnersPageContent from '@viewsComponents/winnersPageContent/winnersPageContent';
 
-const gamePage = () => {
+const winnerPage = () => {
     return createComponent<HTMLTemplateElement>({
         tag: 'template',
         children: [header({}), winnersPageContent({}), footer({})],
     });
 };
 
-export default gamePage;
+export default winnerPage;

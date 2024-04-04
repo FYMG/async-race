@@ -1,8 +1,7 @@
 import createComponent, { BaseComponent } from '@components/baseComponent.ts';
-import routes, { IRoute, IRouteParams } from '@utils/consts/routes';
+import { IRoute, IRouteParams } from '@utils/consts/routes';
 import throwError from '@utils/helpers/throwError';
 import getRouteByPath from '@utils/helpers/getRouteByPath';
-import { useAuthProvider } from '@services/auth.ts';
 
 class Router {
     private root: BaseComponent;
@@ -18,9 +17,6 @@ class Router {
     static create(rootComponent?: BaseComponent, defaultRoute?: IRoute): Router {
         if (Router.instance) {
             throwError('Router already created');
-        }
-        if (!useAuthProvider().isInitialized) {
-            throwError('For a Router work, initiate authProvider first');
         }
         Router.instance = new Router(rootComponent, defaultRoute);
         return Router.instance;
@@ -106,11 +102,6 @@ class Router {
                 });
             }
 
-            if (route.needAuth && !useAuthProvider().isAuth) {
-                this.route(routes.startPage);
-                return;
-            }
-
             url.pathname = route.path;
 
             let routeViewComponent = route.view({});
@@ -144,10 +135,11 @@ class Router {
         Object.keys(route.params ?? {}).forEach((param) => {
             if (routeCopy.params) {
                 if (typeof urlParams.get(param) === 'string') {
-                    routeCopy.params[param] = JSON.parse(urlParams.get(param)!) as
+                    routeCopy.params[param] = JSON.parse(String(urlParams.get(param))) as
                         | string
+                        | number
                         | boolean
-                        | number;
+                        | undefined;
                 } else {
                     routeCopy.params[param] = urlParams.get(param);
                 }

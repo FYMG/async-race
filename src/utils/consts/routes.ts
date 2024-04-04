@@ -1,6 +1,6 @@
 import startPageView from '@views/startPage';
 import { FunctionComponent } from '@components/baseComponent';
-import gamePage from '@views/gamePage.ts';
+import winnerPage from '@views/winnerPage.ts';
 
 export interface IRouteParams {
     [key: string]: string | boolean | number | undefined | null;
@@ -35,7 +35,7 @@ const Routes: IRoutes = {
     winners: {
         name: 'winners',
         path: '/fymg-JSFE2023Q4/winners',
-        view: gamePage,
+        view: winnerPage,
         needAuth: false,
         params: {
             difficulty: undefined,
