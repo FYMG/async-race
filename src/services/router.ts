@@ -10,6 +10,7 @@ class Router {
         if (Router.instance) {
             throwError('Router already created');
         }
+
         Router.instance = new Router(rootComponent, defaultRoute);
 
         return Router.instance;
@@ -31,6 +32,7 @@ class Router {
                     window.location.origin + window.location.pathname,
                 );
             }
+
             const route = url.pathname;
 
             const paramsObj: Record<string, string> = {};
@@ -171,6 +173,7 @@ export const useRouter = () => {
     if (!Router.getInstance()) {
         throwError('Router not created');
     }
+
     const router = Router.getInstance();
 
     return {

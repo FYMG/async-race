@@ -80,8 +80,21 @@
                         "prev": ["const", "let", "var"],
                         "next": ["const", "let", "var"]
                     },
-                    { "blankLine": "any", "prev": "directive", "next": "directive" },
-                    { "blankLine": "always", "prev": ["block"], "next": "*" },
+                    {
+                        "blankLine": "always",
+                        "prev": ["multiline-const", "multiline-let", "multiline-var"],
+                        "next": ["*"]
+                    },
+                    {
+                        "blankLine": "any",
+                        "prev": "directive",
+                        "next": "directive"
+                    },
+                    {
+                        "blankLine": "always",
+                        "prev": ["block", "if", "for", "while"],
+                        "next": "*"
+                    },
                     {
                         "blankLine": "always",
                         "prev": "*",

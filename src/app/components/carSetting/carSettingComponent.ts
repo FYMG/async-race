@@ -32,6 +32,7 @@ export class CarSettingComponent extends BaseComponent<HTMLDivElement> {
         if (!this.car) {
             return;
         }
+
         void useRaceApi().updateCar(
             this.car.id,
             this.nameComponent.getNode().value,

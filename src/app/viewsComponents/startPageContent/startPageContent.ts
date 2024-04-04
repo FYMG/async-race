@@ -45,6 +45,7 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
         ) {
             return;
         }
+
         carsComponent.getChildren().forEach((child) => {
             if (child instanceof CarComponent) {
                 child.stop();
@@ -166,6 +167,7 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
                 if (page === 1) {
                     return;
                 }
+
                 goToPage(page - 1);
                 currPage.getNode().textContent = `Page ${page}`;
             }),
@@ -178,6 +180,7 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
                 if (totalItems / limit <= page) {
                     return;
                 }
+
                 goToPage(page + 1);
                 currPage.getNode().textContent = `Page ${page}`;
             }),

@@ -88,6 +88,7 @@ class RaceApi {
         if (baseUrl) {
             RaceApi.baseUrl = baseUrl;
         }
+
         RaceApi.instance = new RaceApi();
 
         return RaceApi.instance;
@@ -446,6 +447,7 @@ class RaceApi {
                 ),
             );
         }
+
         void Promise.all(cars).then(callback);
     }
 
@@ -470,6 +472,7 @@ export const useRaceApi = () => {
     if (!RaceApi.getInstance()) {
         throwError('RaceApi Provider not created');
     }
+
     const raceApi = RaceApi.getInstance();
 
     return {

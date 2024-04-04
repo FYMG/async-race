@@ -179,6 +179,7 @@ const winnersPageContent: typeof createComponent<HTMLElement> = ({
                 if (page === 1) {
                     return;
                 }
+
                 goToPage(page - 1);
                 currPage.getNode().textContent = `Page ${page}`;
             }),
@@ -191,6 +192,7 @@ const winnersPageContent: typeof createComponent<HTMLElement> = ({
                 if (totalItems / limit <= page + 1) {
                     return;
                 }
+
                 goToPage(page + 1);
                 currPage.getNode().textContent = `Page ${page}`;
             }),

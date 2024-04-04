@@ -89,6 +89,7 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
                 this.stop();
             }
         });
+
         const carControlBlock = createComponent({
             tag: 'div',
             classList: style['car__control'],
@@ -113,6 +114,7 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
                 }).addEventListener('click', () => {
                     this.editComponent.selectCar(this.carObj, this);
                 }),
+
                 this.startButton,
                 this.driveButton,
                 this.winText,
@@ -163,6 +165,7 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
 
                 return;
             }
+
             void useRaceApi().updateWinner(
                 this.carObj.id,
                 this.lastRaceTime < data.time ? this.lastRaceTime : data.time,
@@ -178,6 +181,7 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
         if (this.animationInterval) {
             clearInterval(this.animationInterval);
         }
+
         useRaceApi().engineStop(this.id, (data) => {
             this.startButton.getNode().textContent = 'start';
             this.driveButton.getNode().disabled = true;

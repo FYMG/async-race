@@ -64,6 +64,7 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
                 }
             });
         }
+
         this.children = removeDuplicates(this.children).filter((child) =>
             this.isChild(child),
         );
@@ -177,6 +178,7 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
 
             return undefined;
         }
+
         child.parent?.removeChildren(child);
         child.parent = this;
         node.append(child.node);
@@ -210,6 +212,7 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
             );
             component.parent = this.parent;
         }
+
         [this.node, component.node] = [component.node, this.node];
         this.node.replaceWith(component.node);
 
