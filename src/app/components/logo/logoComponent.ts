@@ -12,11 +12,13 @@ const logoComponent: FunctionComponent = ({ classList, children, ...props }) => 
         src: logo,
         alt: `logo ${TextStrings.siteName}`,
     });
+
     const logoText = createComponent<HTMLSpanElement>({
         tag: 'span',
         classList: style['site-logo__text'],
         textContent: TextStrings.siteName,
     });
+
     return createComponent({
         tag: 'a',
         classList: mergeClassLists(style['site-logo'], classList),

@@ -40,20 +40,26 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
     }: IProps<T>): T {
         this.props = { tag, classList, textContent, children, ...props } as IProps<T>;
         let node = document.createElement(tag ?? 'div') as T;
+
         node = Object.assign(node, props);
+
         if (classList) {
             this.applyClassList(node, classList);
         }
+
         if (textContent) {
             node.textContent = textContent;
         }
+
         if (children) {
             this.children = this.appendChildrenToNode(node, children);
         }
+
         if (style) {
             Object.entries(style).forEach(([key, value]) => {
                 if (value) {
                     const stringValue = String(value);
+
                     node.style.setProperty(key, stringValue);
                 }
             });
@@ -61,6 +67,7 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
         this.children = removeDuplicates(this.children).filter((child) =>
             this.isChild(child),
         );
+
         return node;
     }
 
@@ -74,11 +81,13 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
         } else {
             this.append(children);
         }
+
         return this;
     }
 
     public append(child: BaseComponent | string): this {
         const addedNode = this.appendToNode(this.node, child);
+
         if (addedNode) {
             this.children.push(addedNode);
         }
@@ -86,6 +95,7 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
         this.children = removeDuplicates(this.children).filter((item) =>
             this.isChild(item),
         );
+
         return this;
     }
 
@@ -96,6 +106,7 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
         options?: boolean | AddEventListenerOptions | undefined,
     ): this {
         this.node.addEventListener(type, listener, options);
+
         return this;
     }
 
@@ -109,6 +120,7 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
 
     public addClass(classNameClassName: string): this {
         this.node.classList.add(classNameClassName);
+
         return this;
     }
 
@@ -139,30 +151,36 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
         children: NonNullable<TChildren>,
     ): BaseComponent[] | [] {
         const result: BaseComponent[] = [];
+
         if (Array.isArray(children)) {
             children.forEach((child) => {
                 const addedNode = this.appendToNode(node, child);
+
                 if (addedNode) {
                     result.push(addedNode);
                 }
             });
         } else {
             const addedNode = this.appendToNode(node, children);
+
             if (addedNode !== undefined) {
                 result.push(addedNode);
             }
         }
+
         return result;
     }
 
     private appendToNode(node: T, child: BaseComponent | string): BaseComponent | void {
         if (typeof child === 'string') {
             node.append(document.createTextNode(child));
+
             return undefined;
         }
         child.parent?.removeChildren(child);
         child.parent = this;
         node.append(child.node);
+
         return child;
     }
 
@@ -185,6 +203,7 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
             );
             this.parent = component.parent;
         }
+
         if (component.parent) {
             component.parent.children.filter(
                 (item) => !item.getNode().isEqualNode(this.getNode()),
@@ -193,6 +212,7 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
         }
         [this.node, component.node] = [component.node, this.node];
         this.node.replaceWith(component.node);
+
         return this;
     }
 
@@ -202,6 +222,7 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
             (item) => !item.getNode().isEqualNode(child.getNode()),
         );
         child.parent = null;
+
         return this;
     }
 
@@ -217,6 +238,7 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
                     obs.disconnect();
                 }
             });
+
             observer.observe(document.body, { childList: true, subtree: true });
         })
             .then(() => callback(this))
@@ -234,4 +256,5 @@ export type FunctionComponent<
 const createComponent = <ElementType extends HTMLElement = HTMLElement>(
     props: IProps<ElementType>,
 ) => new BaseComponent<ElementType>(props);
+
 export default createComponent;

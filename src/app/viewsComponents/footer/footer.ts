@@ -22,4 +22,5 @@ const footer: typeof createComponent<HTMLDivElement> = ({
         ...props,
     });
 };
+
 export default footer;

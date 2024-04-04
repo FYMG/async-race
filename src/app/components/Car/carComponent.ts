@@ -36,16 +36,14 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
 
     private lastRaceTime: number;
 
-    private winText: BaseComponent<HTMLElement>;
+    private readonly winText: BaseComponent<HTMLElement>;
 
     constructor(carObj: ICarModel, editComponent: CarSettingComponent, props: IProps) {
         super(props);
 
         this.id = carObj.id;
-
         this.editComponent = editComponent;
         this.carObj = carObj;
-
         this.lastRaceTime = 0;
 
         this.startButton = createComponent({
@@ -162,6 +160,7 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
             if (!data.id) {
                 console.log('create winner');
                 useRaceApi().createWinner(this.carObj.id, this.lastRaceTime);
+
                 return;
             }
             void useRaceApi().updateWinner(
@@ -175,6 +174,7 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
 
     stop(callback?: () => void) {
         this.winText.getNode().textContent = '';
+
         if (this.animationInterval) {
             clearInterval(this.animationInterval);
         }
@@ -217,6 +217,7 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
         this.driveButton.getNode().disabled = true;
         this.animationInterval = setInterval(() => {
             const node = this.trackCar!.getNode();
+
             const totalWidth = this.getNode().clientWidth;
 
             letToGo -= drivePerPeriod;

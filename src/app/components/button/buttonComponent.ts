@@ -13,4 +13,5 @@ const buttonComponent: FunctionComponent<HTMLButtonElement> = ({
         children,
         ...props,
     });
+
 export default buttonComponent;

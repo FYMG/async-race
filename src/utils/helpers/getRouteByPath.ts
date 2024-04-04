@@ -6,6 +6,7 @@ export default function getRouteByPath(path: string) {
             if (Routes[routeName]?.path === path) {
                 return Routes[routeName];
             }
+
             return acc;
         },
         undefined,

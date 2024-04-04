@@ -4,14 +4,6 @@ import throwError from '@utils/helpers/throwError';
 import getRouteByPath from '@utils/helpers/getRouteByPath';
 
 class Router {
-    private root: BaseComponent;
-
-    private readonly defaultRoute: IRoute | undefined;
-
-    private states: Record<string, BaseComponent<HTMLTemplateElement>> = {};
-
-    private prevRoute = '';
-
     private static instance: Router;
 
     static create(rootComponent?: BaseComponent, defaultRoute?: IRoute): Router {
@@ -19,6 +11,7 @@ class Router {
             throwError('Router already created');
         }
         Router.instance = new Router(rootComponent, defaultRoute);
+
         return Router.instance;
     }
 
@@ -26,15 +19,12 @@ class Router {
         return !!Router.instance;
     }
 
-    private constructor(rootComponent?: BaseComponent, defaultRoute?: IRoute) {
-        this.root = this.createOrGetRoot(rootComponent);
-        this.defaultRoute = defaultRoute;
-    }
-
     public static initialLoad() {
         const load = () => {
             const redirectUrl = window.location.href.split('/?/')[1];
+
             let url = new URL(window.location.href.toString());
+
             if (redirectUrl) {
                 url = new URL(
                     `${window.location.pathname}${redirectUrl}`,
@@ -42,7 +32,9 @@ class Router {
                 );
             }
             const route = url.pathname;
+
             const paramsObj: Record<string, string> = {};
+
             new URLSearchParams(url.search).forEach((value, key) => {
                 paramsObj[key] = value;
             });
@@ -54,6 +46,23 @@ class Router {
         });
 
         load();
+    }
+
+    static getInstance() {
+        return Router.instance;
+    }
+
+    private root: BaseComponent;
+
+    private readonly defaultRoute: IRoute | undefined;
+
+    private states: Record<string, BaseComponent<HTMLTemplateElement>> = {};
+
+    private prevRoute = '';
+
+    private constructor(rootComponent?: BaseComponent, defaultRoute?: IRoute) {
+        this.root = this.createOrGetRoot(rootComponent);
+        this.defaultRoute = defaultRoute;
     }
 
     private createOrGetRoot(rootComponent?: BaseComponent) {
@@ -86,12 +95,14 @@ class Router {
         if (!route && !this.defaultRoute) {
             throwError('Route never exist and default route is not set');
         }
+
         if (!route && this.defaultRoute) {
             route = this.defaultRoute;
         }
 
         if (route) {
             const url = new URL(window.location.href);
+
             url.searchParams.forEach((_, key) => url.searchParams.delete(key));
 
             if (params) {
@@ -105,7 +116,9 @@ class Router {
             url.pathname = route.path;
 
             let routeViewComponent = route.view({});
+
             this.states[this.prevRoute]?.appendChildren(this.root.getChildren());
+
             if (this.states[route.path]) {
                 routeViewComponent = this.states[route.path]!;
                 routeViewComponent.getChildren().forEach((item) => item.onRoute());
@@ -116,6 +129,7 @@ class Router {
             this.root.getChildren().forEach((child) => child.remove());
             this.root.appendChildren(routeViewComponent.getChildren());
             this.prevRoute = route.path;
+
             if (pushState) {
                 window.history.pushState({}, '', url);
             }
@@ -126,12 +140,15 @@ class Router {
         const route = getRouteByPath(window.location.pathname)!;
 
         const routeCopy = JSON.parse(JSON.stringify(route)) as typeof route;
+
         routeCopy.params = {};
+
         if (!route) {
             throwError('Route not found');
         }
 
         const urlParams = new URLSearchParams(window.location.search);
+
         Object.keys(route.params ?? {}).forEach((param) => {
             if (routeCopy.params) {
                 if (typeof urlParams.get(param) === 'string') {
@@ -145,11 +162,8 @@ class Router {
                 }
             }
         });
-        return routeCopy;
-    }
 
-    static getInstance() {
-        return Router.instance;
+        return routeCopy;
     }
 }
 
@@ -158,6 +172,7 @@ export const useRouter = () => {
         throwError('Router not created');
     }
     const router = Router.getInstance();
+
     return {
         root: router.getRoot(),
         route: router.route.bind(router),
@@ -169,5 +184,6 @@ export const useRouter = () => {
 export const createRouter = (root?: BaseComponent, defaultRoute?: IRoute) => {
     Router.create(root, defaultRoute);
     Router.initialLoad();
+
     return useRouter();
 };

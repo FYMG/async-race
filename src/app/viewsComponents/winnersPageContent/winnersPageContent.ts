@@ -16,20 +16,26 @@ const winnersPageContent: typeof createComponent<HTMLElement> = ({
     ...props
 }) => {
     let page = 1;
+
     let totalItems = 0;
+
     const limit = 10;
+
     let order: 'DESC' | 'ASC' = 'DESC';
+
     let sort: 'wins' | 'time' = 'wins';
 
     const winnersComponent = createComponent({
         tag: 'div',
         classList: style['winners__table'],
     });
+
     const goToPage = (newPage: number) => {
         page = newPage;
 
         winnersComponent.getChildren().forEach((child) => child.remove());
         const loader = loaderComponent({});
+
         winnersComponent.append(loader);
         void useRaceApi().getWinners({
             page,
@@ -212,4 +218,5 @@ const winnersPageContent: typeof createComponent<HTMLElement> = ({
 
     return main;
 };
+
 export default winnersPageContent;

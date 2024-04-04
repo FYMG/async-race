@@ -66,7 +66,28 @@
                 "@typescript-eslint/indent": 0,
                 "@typescript-eslint/no-explicit-any": "error",
                 "@typescript-eslint/dot-notation": 0,
-                "curly": ["error", "all"]
+                "curly": ["error", "all"],
+                "padding-line-between-statements": [
+                    "error",
+                    { "blankLine": "always", "prev": "*", "next": "return" },
+                    {
+                        "blankLine": "always",
+                        "prev": ["const", "let", "var"],
+                        "next": "*"
+                    },
+                    {
+                        "blankLine": "any",
+                        "prev": ["const", "let", "var"],
+                        "next": ["const", "let", "var"]
+                    },
+                    { "blankLine": "any", "prev": "directive", "next": "directive" },
+                    { "blankLine": "always", "prev": ["block"], "next": "*" },
+                    {
+                        "blankLine": "always",
+                        "prev": "*",
+                        "next": ["if", "for", "while", "block"]
+                    }
+                ]
             }
         }
     ]

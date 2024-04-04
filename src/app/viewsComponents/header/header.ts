@@ -43,4 +43,5 @@ const header: typeof createComponent<HTMLElement> = ({
         ...props,
     });
 };
+
 export default header;

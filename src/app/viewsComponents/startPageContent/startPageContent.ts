@@ -15,9 +15,13 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
     ...props
 }) => {
     let page = 1;
+
     let totalItems = 0;
+
     const limit = 7;
+
     let raceWinner: CarComponent | null = null;
+
     let racePage = page;
 
     const carsComponent = createComponent({
@@ -35,6 +39,7 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
                 if (item instanceof CarComponent) {
                     return item.engineIsStarted();
                 }
+
                 return false;
             })
         ) {
@@ -47,12 +52,14 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
             }
         });
     };
+
     const goToPage = (newPage: number) => {
         racePage = page;
         page = newPage;
 
         carsComponent.getChildren().forEach((child) => child.remove());
         const loader = loaderComponent({});
+
         carsComponent.append(loader);
         void useRaceApi().getCars(page, limit, (data, headers) => {
             stopAllCars();
@@ -122,6 +129,7 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
                             if (item instanceof CarComponent) {
                                 return !item.engineIsStarted();
                             }
+
                             return !(item instanceof CarComponent);
                         })
                     ) {
@@ -191,4 +199,5 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
         goToPage(page);
     });
 };
+
 export default startPageContent;

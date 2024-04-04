@@ -78,23 +78,33 @@ enum EngineStatuses {
 class RaceApi {
     private static instance: RaceApi;
 
-    private headers = {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-    };
-
     private static baseUrl = 'http://localhost:3000';
 
     public static create(baseUrl?: string): RaceApi {
         if (RaceApi.instance) {
             throwError('RaceApi Provider already created');
         }
+
         if (baseUrl) {
             RaceApi.baseUrl = baseUrl;
         }
         RaceApi.instance = new RaceApi();
+
         return RaceApi.instance;
     }
+
+    static getIsInitialized() {
+        return !!RaceApi.instance;
+    }
+
+    static getInstance() {
+        return RaceApi.instance;
+    }
+
+    private headers = {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+    };
 
     public getResp<ResponseType, UrlParams extends IUrlParams = NonNullable<unknown>>({
         endpoint,
@@ -203,6 +213,7 @@ class RaceApi {
         endpoint: string,
     ) {
         const urlOptions = options;
+
         let url = `${RaceApi.baseUrl}${endpoint}?`;
 
         Object.keys(urlOptions).forEach((key) => {
@@ -232,11 +243,13 @@ class RaceApi {
                     res: Response,
                 ): Promise<{ data: ResponseType; ResponseHeaders: Headers }> => {
                     let data: ResponseType;
+
                     try {
                         data = (await res.json()) as ResponseType;
                     } catch (err) {
                         data = {} as ResponseType;
                     }
+
                     return {
                         data,
                         ResponseHeaders: res.headers,
@@ -423,6 +436,7 @@ class RaceApi {
 
     public generateCars(count: number, callback: (data: ICarModel[]) => void) {
         const cars: Promise<ICarModel>[] = [];
+
         for (let i = 0; i < count; i += 1) {
             cars.push(
                 this.createCar(
@@ -450,14 +464,6 @@ class RaceApi {
             },
         });
     }
-
-    static getIsInitialized() {
-        return !!RaceApi.instance;
-    }
-
-    static getInstance() {
-        return RaceApi.instance;
-    }
 }
 
 export const useRaceApi = () => {
@@ -465,6 +471,7 @@ export const useRaceApi = () => {
         throwError('RaceApi Provider not created');
     }
     const raceApi = RaceApi.getInstance();
+
     return {
         updateWinner: raceApi.updateWinner.bind(raceApi),
         getWinner: raceApi.getWinner.bind(raceApi),
@@ -485,5 +492,6 @@ export const useRaceApi = () => {
 
 export const createRaceApiProvider = () => {
     RaceApi.create();
+
     return useRaceApi();
 };

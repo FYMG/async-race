@@ -2,6 +2,7 @@ import { TChildren } from '@components/baseComponent.ts';
 
 const mergeChildrenLists = (...classLists: TChildren[]): TChildren => {
     const result: NonNullable<TChildren> = [];
+
     classLists.forEach((item) => {
         if (Array.isArray(item)) {
             result.concat(item);
@@ -9,6 +10,7 @@ const mergeChildrenLists = (...classLists: TChildren[]): TChildren => {
             result.push(item);
         }
     });
+
     return result;
 };
 

@@ -90,6 +90,7 @@ const carSettingComponent: FunctionComponent<
                         )
                         .then((data) => {
                             update?.();
+
                             return data;
                         });
                 }
