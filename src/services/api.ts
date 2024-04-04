@@ -192,7 +192,6 @@ class RaceApi {
         errorCallback: LoadErrorCallback = () => {},
     ): Promise<Response> {
         if (!res.ok) {
-            console.log('error');
             errorCallback(res);
         }
 
@@ -232,8 +231,14 @@ class RaceApi {
                 async (
                     res: Response,
                 ): Promise<{ data: ResponseType; ResponseHeaders: Headers }> => {
+                    let data: ResponseType;
+                    try {
+                        data = (await res.json()) as ResponseType;
+                    } catch (err) {
+                        data = {} as ResponseType;
+                    }
                     return {
-                        data: (await res.json()) as ResponseType,
+                        data,
                         ResponseHeaders: res.headers,
                     };
                 },
@@ -427,7 +432,7 @@ class RaceApi {
                 ),
             );
         }
-        Promise.all(cars).then(callback).catch(console.log);
+        void Promise.all(cars).then(callback);
     }
 
     public updateCar(

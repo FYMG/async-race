@@ -21,7 +21,6 @@ const header: typeof createComponent<HTMLElement> = ({
     const winners = buttonComponent({
         textContent: 'Winners',
     }).addEventListener('click', () => {
-        console.log(routeInfo().path);
         if (routeInfo().path === Routes.startPage.path) {
             route(Routes.winners);
             winners.getNode().textContent = 'Garage';

@@ -189,6 +189,11 @@ export class CarComponent extends BaseComponent<HTMLDivElement> {
         callback?.();
     }
 
+    setCar(car: ICarModel) {
+        this.carObj = car;
+        this.render();
+    }
+
     start(callback?: () => void) {
         useRaceApi().engineStart(this.id, (data) => {
             this.startButton.getNode().textContent = 'stop';

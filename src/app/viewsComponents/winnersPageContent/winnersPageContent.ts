@@ -40,7 +40,6 @@ const winnersPageContent: typeof createComponent<HTMLElement> = ({
                 winnersComponent.getChildren().forEach((child) => {
                     child.destroy();
                 });
-                console.log(data);
                 totalItems = parseInt(headers.get('X-Total-Count') ?? '0', 10);
                 winnersComponent.append(
                     createComponent({
@@ -117,7 +116,7 @@ const winnersPageContent: typeof createComponent<HTMLElement> = ({
                     }),
                 );
                 data.forEach((winner) => {
-                    useRaceApi().getCar(winner.id, (car) => {
+                    void useRaceApi().getCar(winner.id, (car) => {
                         winnersComponent.append(
                             createComponent({
                                 tag: 'div',

@@ -99,11 +99,6 @@ export class BaseComponent<T extends HTMLElement = HTMLElement> {
         return this;
     }
 
-    log(): this {
-        console.log(this);
-        return this;
-    }
-
     public getNode(): T {
         return this.node;
     }

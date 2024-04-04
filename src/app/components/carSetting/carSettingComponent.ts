@@ -32,13 +32,13 @@ export class CarSettingComponent extends BaseComponent<HTMLDivElement> {
         if (!this.car) {
             return;
         }
-        useRaceApi().updateCar(
+        void useRaceApi().updateCar(
             this.car.id,
             this.nameComponent.getNode().value,
             this.colorComponent.getNode().value,
             (data) => {
                 callback?.(data);
-                this.carComponent?.render();
+                this.carComponent?.setCar(data);
             },
         );
     }
@@ -89,7 +89,6 @@ const carSettingComponent: FunctionComponent<
                             colorComponent.getNode().value,
                         )
                         .then((data) => {
-                            console.log('car success created:', data);
                             update?.();
                             return data;
                         });

@@ -78,15 +78,16 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
         });
     };
 
-    carEditComponent.addEventListener('click', () => {
-        goToPage(racePage);
-    });
-
     const controlBlock = createComponent<HTMLDivElement>({
         tag: 'div',
         classList: style['garage__control'],
         children: [
-            carSettingComponent({ edit: false, update: () => goToPage(page) }),
+            carSettingComponent({
+                edit: false,
+                update: () => {
+                    goToPage(page);
+                },
+            }),
             carEditComponent,
         ],
     });
@@ -166,7 +167,7 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
                 classList: style['garage__pagination-button'],
                 textContent: 'next',
             }).addEventListener('click', () => {
-                if (totalItems / limit <= page + 1) {
+                if (totalItems / limit <= page) {
                     return;
                 }
                 goToPage(page + 1);
@@ -181,7 +182,7 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
         children: [controlBlock, controlButtons, carsComponent, pagination],
     });
 
-    const main = createComponent({
+    return createComponent({
         tag: 'main',
         classList: mergeClassLists(style['garage'], classList),
         children: mergeChildrenLists(content, children),
@@ -189,11 +190,5 @@ const startPageContent: typeof createComponent<HTMLElement> = ({
     }).componentDidMount(() => {
         goToPage(page);
     });
-
-    main.onRoute = () => {
-        goToPage(page);
-    };
-
-    return main;
 };
 export default startPageContent;

@@ -107,7 +107,6 @@ class Router {
             }
 
             if (route.needAuth && !useAuthProvider().isAuth) {
-                console.log('not auth redirect to login page ');
                 this.route(routes.startPage);
                 return;
             }
@@ -126,7 +125,6 @@ class Router {
             this.root.getChildren().forEach((child) => child.remove());
             this.root.appendChildren(routeViewComponent.getChildren());
             this.prevRoute = route.path;
-            console.log(this.prevRoute, this.states);
             if (pushState) {
                 window.history.pushState({}, '', url);
             }
