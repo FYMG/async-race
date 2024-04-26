@@ -1,0 +1,17 @@
+/* postcss-bem-linter: define header */
+.header {
+  cursor: pointer;
+  padding: 8px;
+  font-size: 18px;
+  font-weight: bold;
+
+  &__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    max-width: 768px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+}
