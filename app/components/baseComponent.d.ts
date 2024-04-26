@@ -1,0 +1,42 @@
+export type IProps<T extends HTMLElement = HTMLElement> = Partial<Omit<T, 'style' | 'dataset' | 'classList' | 'children' | 'tagName'>> & {
+    [key: PropertyKey]: unknown;
+    tag?: keyof HTMLElementTagNameMap;
+    classList?: TClassList;
+    textContent?: string;
+    children?: TChildren;
+    style?: Partial<CSSStyleDeclaration>;
+};
+export type TClassList = string[] | string;
+export type TChildren = (BaseComponent | string)[] | string | BaseComponent | undefined;
+export declare class BaseComponent<T extends HTMLElement = HTMLElement> {
+    protected node: T;
+    props: IProps<T>;
+    protected children: BaseComponent[];
+    protected parent: BaseComponent | null;
+    onRoute: () => void;
+    constructor(props: IProps<T>);
+    protected createNode({ tag, style, classList, textContent, children, ...props }: IProps<T>): T;
+    isChild(child: BaseComponent): boolean;
+    appendChildren(children: NonNullable<TChildren>): this;
+    append(child: BaseComponent | string): this;
+    addEventListener<K extends keyof HTMLElementEventMap>(this: this, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => void, options?: boolean | AddEventListenerOptions | undefined): this;
+    getNode(): T;
+    getChildren(): BaseComponent[];
+    addClass(classNameClassName: string): this;
+    toggleClass(classSurname: string): void;
+    removeClass(className: string): void;
+    destroy(): void;
+    private applyClassList;
+    private appendChildrenToNode;
+    private appendToNode;
+    haveChildren(child: BaseComponent): boolean;
+    haveChildrenNode(node: Element): boolean;
+    isNode(node: Element): boolean;
+    replaceWith(component: BaseComponent<T>): this;
+    removeChildren(child: BaseComponent): this;
+    remove(): void;
+    componentDidMount(callback: (elem: this) => void): this;
+}
+export type FunctionComponent<ElementType extends HTMLElement = HTMLElement, AdditionalProps = Record<PropertyKey, unknown>, BaseComponentType extends BaseComponent<ElementType> = BaseComponent<ElementType>> = (props: IProps<ElementType> & AdditionalProps) => BaseComponentType;
+declare const createComponent: <ElementType extends HTMLElement = HTMLElement>(props: IProps<ElementType>) => BaseComponent<ElementType>;
+export default createComponent;
